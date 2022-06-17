@@ -51,7 +51,7 @@ namespace cfhs {
         complex<double> *operator[](const size_t i);
         complex<double> *operator[](const size_t i) const;
 
-        matrix &operator=(const matrix &m1);
+        matrix operator=(const matrix &m1);
 
         matrix operator-();
         matrix operator++(int);
@@ -59,7 +59,7 @@ namespace cfhs {
         friend matrix transpose(matrix &m1);
         static matrix inverte(matrix &m1);
         friend matrix extend(matrix &m1, matrix &m2);
-        friend matrix extract(matrix &m1, int x0, int y0, int x1, int y1);
+        friend matrix extract(matrix &m1, int x0, int x1, int y0, int y1);
 
         void swapLine(int l1, int l2);
         matrix swapColForVector(int col, matrix &vec);
@@ -92,7 +92,7 @@ namespace cfhs {
         matrix LUDecomposition();
         matrix LUBacksubstitution(matrix b);
         matrix QRDecomposition();
-        static matrix eigenpairs(matrix &m1, int nmax);
+        static matrix eigenpairs(matrix m1, int nmax);
 
         void fill(istream &in);
         void fill(complex<double> val);

@@ -40,7 +40,7 @@ matrix matrix::id(int n)
 }
 
 
-matrix libmath::permutation(int n, int l1, int l2)
+matrix cfhs::permutation(int n, int l1, int l2)
 {
 	matrix res = matrix::id(n);
 	res.swapLine(l1, l2);
@@ -109,7 +109,7 @@ complex<double> *matrix::operator[](const size_t i) const
 }
 
 
-matrix& matrix::operator= (const matrix& m1)
+matrix matrix::operator= (const matrix& m1)
 {
     if(mat != nullptr) delete[] mat;
     if(perms != nullptr) delete[] perms;
@@ -149,7 +149,7 @@ matrix matrix::operator++(int) {
     return *this;
 }
 
-matrix libmath::operator-(const matrix& m1, const matrix& m2)
+matrix cfhs::operator-(const matrix& m1, const matrix& m2)
 {
     matrix res(m1.n, m1.m);
     for (int i = 0; i < m1.n; i++) {
@@ -164,14 +164,14 @@ matrix matrix::operator~()
 {
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < m; j++) {
-            (*this)(i, j) = (*this)(i, j);
+            (*this)(i, j) = conj((*this)(i, j));
         }
     }
     return *this;
 }
 
 
-matrix libmath::operator+(const matrix& m1, const matrix& m2)
+matrix cfhs::operator+(const matrix& m1, const matrix& m2)
 {
     matrix res(m1.n, m1.m);
     for (int i = 0; i < m1.n; i++) {
@@ -182,7 +182,7 @@ matrix libmath::operator+(const matrix& m1, const matrix& m2)
     return res;
 }
 
-matrix libmath::operator+(const matrix& m1, complex<double> v)
+matrix cfhs::operator+(const matrix& m1, complex<double> v)
 {
     matrix res(m1.n, m1.m);
     for(int i = 0; i < m1.n; i++)
@@ -194,24 +194,23 @@ matrix libmath::operator+(const matrix& m1, complex<double> v)
     return res;
 }
 
-matrix libmath::operator+(complex<double> v, const matrix& m1)
+matrix cfhs::operator+(complex<double> v, const matrix& m1)
 {
     return operator+(m1, v);
 }
 
-matrix libmath::operator*(matrix m1, matrix m2)
+matrix cfhs::operator*(matrix m1, matrix m2)
 {
     matrix newm(m1.n, m2.m);
-    #pragma omp parallel for
-    for (int i = 0; i < newm.m; i++) {
-        for (int j = 0; j < newm.n; j++) {
+    for (int i = 0; i < newm.n; i++) {
+        for (int j = 0; j < newm.m; j++) {
             complex<double> v = 0.;
             for (int k = 0; k < m1.m; k++) {
-                complex<double> v1 = m2(k, i);
-                complex<double> v2 = m1(j, k);
-                v = v + v1 * v2;
+                complex<double> v1 = m1(i, k);
+                complex<double> v2 = m2(k, j);
+                v += v1 * v2;
             }
-            newm(j, i) = v;
+            newm(i, j) = v;
         }
     }
 
@@ -219,7 +218,7 @@ matrix libmath::operator*(matrix m1, matrix m2)
 }
 
 
-matrix libmath::operator*(matrix& m1, complex<double> v)
+matrix cfhs::operator*(matrix& m1, complex<double> v)
 {
     matrix res = m1;
     int i = 0, j = 0;
@@ -233,18 +232,18 @@ matrix libmath::operator*(matrix& m1, complex<double> v)
     return res;
 }
 
-matrix libmath::operator/(matrix& m1, complex<double> v)
+matrix cfhs::operator/(matrix& m1, complex<double> v)
 {
     return operator*(m1, 1./v);
 }
 
-matrix libmath::operator*(complex<double> v, matrix& m1)
+matrix cfhs::operator*(complex<double> v, matrix& m1)
 {
-    return libmath::operator*(m1, v);
+    return cfhs::operator*(m1, v);
 }
 
 
-matrix libmath::operator^(matrix& m1, int e)
+matrix cfhs::operator^(matrix& m1, int e)
 {
     matrix r = m1;
     for (int i = 0; i < e; i++) {
@@ -254,7 +253,7 @@ matrix libmath::operator^(matrix& m1, int e)
 }
 
 
-ostream& libmath::operator<<(ostream& out, matrix& m1)
+ostream& cfhs::operator<<(ostream& out, matrix& m1)
 {
     for (int i = 0; i < m1.n; i++) {
         for (int j = 0; j < m1.m; j++) {
@@ -267,7 +266,7 @@ ostream& libmath::operator<<(ostream& out, matrix& m1)
 }
 
 
-istream& libmath::operator>>(istream& in, matrix& m1)
+istream& cfhs::operator>>(istream& in, matrix& m1)
 {
     for (int i = 0; i < m1.n; i++) {
         for (int j = 0; j < m1.m; j++) {
@@ -278,7 +277,7 @@ istream& libmath::operator>>(istream& in, matrix& m1)
 }
 
 
-complex<double> libmath::determinant(matrix& m1)
+complex<double> cfhs::determinant(matrix& m1)
 {
     if (!m1.dirty)
         return m1.det;
@@ -289,7 +288,7 @@ complex<double> libmath::determinant(matrix& m1)
     }
 }
 
-complex<double> libmath::normInf(matrix& m1)
+complex<double> cfhs::normInf(matrix& m1)
 {
     vector<complex<double>> v;
     complex<double> s = 0.;
@@ -307,7 +306,7 @@ complex<double> libmath::normInf(matrix& m1)
 }
 
 
-libmath::matrix::swapOut matrix::swapLineForPivot(int col, int inv)
+cfhs::matrix::swapOut matrix::swapLineForPivot(int col, int inv)
 {
     int firstZero = -1;
     int notZero = -1;
@@ -513,7 +512,7 @@ matrix matrix::QRDecomposition()
 }
 
 
-matrix libmath::transpose(matrix& m1)
+matrix cfhs::transpose(matrix& m1)
 {
     matrix r(m1.m, m1.n);
     for (int i = 0; i < m1.n; i++) {
@@ -559,7 +558,7 @@ matrix matrix::gauss(int inv, int c1, int c2)
 }
 
 
-matrix libmath::extend(matrix& m1, matrix& m2)
+matrix cfhs::extend(matrix& m1, matrix& m2)
 {
     matrix t(m1.n, m1.m + m2.m);
     for (int i = 0; i < t.n; i++) {
@@ -576,7 +575,7 @@ matrix libmath::extend(matrix& m1, matrix& m2)
 }
 
 
-matrix libmath::extract(matrix& m1, int x0, int x1, int y0, int y1)
+matrix cfhs::extract(matrix& m1, int x0, int x1, int y0, int y1)
 {
     matrix r(x1 - x0 + 1, y1 - y0 + 1);
     for (int i = x0; i <= x1; i++) {
@@ -588,10 +587,10 @@ matrix libmath::extract(matrix& m1, int x0, int x1, int y0, int y1)
 }
 
 
-complex<double> libmath::dot(matrix& m1, matrix& m2)
+complex<double> cfhs::dot(matrix& m1, matrix& m2)
 {
     matrix temp1 = transpose(m1);
-    matrix temp =  temp1 * m2;
+    matrix temp =  (~temp1) * m2;
     return temp(0, 0);
 }
 
@@ -629,7 +628,7 @@ matrix matrix::swapColForVector(int col, matrix& vec)
 }
 
 
-matrix libmath::gramschmidt(matrix& m1)
+matrix cfhs::gramschmidt(matrix& m1)
 {
     matrix res = m1;
 
@@ -650,7 +649,7 @@ matrix libmath::gramschmidt(matrix& m1)
 }
 
 
-matrix matrix::eigenpairs(matrix& m1, int nmax)
+matrix matrix::eigenpairs(matrix m1, int nmax)
 {
     matrix temp = m1;
     matrix v0 = random(m1.n, m1.m);
@@ -676,6 +675,32 @@ matrix matrix::eigenpairs(matrix& m1, int nmax)
 
     v0 = extend(v0, eigenvalues);
     return v0;
+
+    /*//raleigh coefficient
+    for(int i = 0; i < m1.m; i++)
+    {
+        //start with initial guess for eigenval eigenvec
+        matrix eigenvec = random(m1.n, 1);
+        complex<double> eigenval = random(1, 1)(0, 0);
+
+        matrix matE = id(m1.m);
+
+        double eps = 10.0;
+        while(eps > 1e-6)
+        {
+            matrix new_eigenvec = random(m1.n, 1);
+
+            matrix temp1 = m1 * eigenvec;
+            matrix temp2 = ~eigenvec;
+            matrix temp3 = temp2 * temp1;
+
+            complex<double> nr = dot(eigenvec, eigenvec);
+
+            complex<double> mu = temp3(0, 0)/nr;
+
+            matrix temp4 = 
+        }
+    }*/
 }
 
 void matrix::fill(istream &in) {
@@ -713,7 +738,7 @@ matrix matrix::execute(complex<double> (*func)(int i, int j, complex<double> vij
     return res;
 }
 
-matrix libmath::slash(matrix& vec)
+matrix cfhs::slash(matrix& vec)
 {
     matrix temp(4, 4);
 
